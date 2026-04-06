@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceCode — AI Coding Assistant for Everyone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --navy: #0d1b2a;
+            --navy-mid: #1a2f45;
+            --navy-light: #24435e;
+            --gold: #c49a3c;
+            --gold-light: #ddb96a;
+            --gold-pale: #f5ecd7;
+            --cream: #faf7f2;
+            --white: #ffffff;
+            --text-body: #2c3e50;
+            --text-muted: #5a6a7a;
+            --text-light: #8a9aaa;
+            --border: #e0d8cc;
+            --green-access: #1a6b4a;
+            --green-light: #e8f4ee;
+            --radius: 4px;
+            --radius-lg: 8px;
+            --shadow-card: 0 2px 12px rgba(13, 27, 42, 0.08);
+            --shadow-deep: 0 8px 40px rgba(13, 27, 42, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Source Serif 4', Georgia, serif;
+            background: var(--cream);
+            color: var(--text-body);
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        /* ── ACCESSIBILITY BAR ── */
+        .access-bar {
+            background: var(--green-access);
+            color: #fff;
+            padding: 6px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+        }
+
+        .access-bar .inner {
+            max-width: 1140px;
+            margin: auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .access-bar span {
+            opacity: 0.9;
+        }
+
+        .access-bar a {
+            color: #a8efd0;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .access-bar a:hover {
+            border-bottom-color: #a8efd0;
+        }
+
+        .access-keys {
+            margin-left: auto;
+            display: flex;
+            gap: 1rem;
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            padding: 1px 6px;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ── NAV ── */
+        nav {
+            background: var(--navy);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .nav-inner {
+            max-width: 1140px;
+            margin: auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            height: 64px;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--white);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            flex-shrink: 0;
+        }
+
+        .logo span {
+            color: var(--gold);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            list-style: none;
+            margin-left: auto;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            font-family: 'Source Serif 4', serif;
+            font-size: 15px;
+            padding: 6px 14px;
+            border-radius: var(--radius);
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-cta {
+            background: var(--gold) !important;
+            color: var(--navy) !important;
+            font-weight: 600 !important;
+            padding: 8px 20px !important;
+        }
+
+        .nav-cta:hover {
+            background: var(--gold-light) !important;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: var(--navy);
+            color: var(--white);
+            padding: 5rem 2rem 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 39px,
+                    rgba(255, 255, 255, 0.025) 39px,
+                    rgba(255, 255, 255, 0.025) 40px),
+                repeating-linear-gradient(90deg,
+                    transparent,
+                    transparent 39px,
+                    rgba(255, 255, 255, 0.025) 39px,
+                    rgba(255, 255, 255, 0.025) 40px);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 1140px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(196, 154, 60, 0.15);
+            border: 1px solid rgba(196, 154, 60, 0.4);
+            color: var(--gold-light);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        .hero-lead {
+            font-size: 18px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gold);
+            color: var(--navy);
+            font-family: 'Source Serif 4', serif;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 13px 28px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            border: 2px solid var(--gold);
+            transition: background 0.2s, transform 0.15s;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-light);
+            border-color: var(--gold-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--white);
+            font-family: 'Source Serif 4', serif;
+            font-size: 16px;
+            font-weight: 400;
+            padding: 13px 28px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255, 255, 255, 0.7);
+            transform: translateY(-1px);
+        }
+
+        /* Hero terminal */
+        .hero-terminal {
+            background: #0a1420;
+            border: 1px solid rgba(196, 154, 60, 0.3);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-deep);
+        }
+
+        .terminal-bar {
+            background: var(--navy-mid);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-r {
+            background: #ff5f57;
+        }
+
+        .dot-y {
+            background: #febc2e;
+        }
+
+        .dot-g {
+            background: #28c840;
+        }
+
+        .terminal-title {
+            margin-left: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .terminal-body {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .t-line {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .t-prompt {
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .t-voice {
+            color: #7dd3fc;
+        }
+
+        .t-output {
+            color: rgba(255, 255, 255, 0.65);
+            padding-left: 20px;
+        }
+
+        .t-code {
+            color: #86efac;
+            padding-left: 20px;
+        }
+
+        .t-comment {
+            color: #475569;
+            padding-left: 20px;
+        }
+
+        .t-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: var(--gold);
+            margin-left: 2px;
+            vertical-align: middle;
+            animation: blink 1.1s step-end infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* ── SECTION BASE ── */
+        section {
+            padding: 5rem 2rem;
+        }
+
+        .section-inner {
+            max-width: 1140px;
+            margin: auto;
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.7rem, 3vw, 2.4rem);
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .section-lead {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        .divider {
+            width: 48px;
+            height: 2px;
+            background: var(--gold);
+            margin: 1.5rem 0 2.5rem;
+        }
+
+        /* ── HOW IT WORKS ── */
+        .how-bg {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .how-bg .section-title {
+            color: var(--white);
+        }
+
+        .how-bg .section-lead {
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            margin-top: 3rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .step {
+            background: var(--navy-mid);
+            padding: 2rem 1.5rem;
+            position: relative;
+            transition: background 0.25s;
+        }
+
+        .step:hover {
+            background: var(--navy-light);
+        }
+
+        .step-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: rgba(196, 154, 60, 0.18);
+            line-height: 1;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.04em;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(196, 154, 60, 0.12);
+            border: 1px solid rgba(196, 154, 60, 0.3);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 18px;
+        }
+
+        .step h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.6rem;
+        }
+
+        .step p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.6;
+        }
+
+        /* ── FEATURES ── */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: box-shadow 0.25s, transform 0.25s;
+        }
+
+        .feature-card:hover {
+            box-shadow: var(--shadow-deep);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gold-pale);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            font-size: 22px;
+        }
+
+        .feature-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--green-access);
+            background: var(--green-light);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        /* ── DEMO ── */
+        .demo-bg {
+            background: #f0ece5;
+        }
+
+        .demo-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+            margin-top: 3rem;
+        }
+
+        .voice-command-demo {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .demo-header {
+            background: var(--navy);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mic-pulse {
+            width: 32px;
+            height: 32px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .mic-pulse::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            animation: ripple 1.5s infinite;
+            opacity: 0;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .demo-header-text {
+            color: var(--white);
+        }
+
+        .demo-header-text strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .demo-header-text span {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .demo-commands {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cmd-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .cmd-voice {
+            background: #f8f5f0;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cmd-voice::before {
+            content: '🎙';
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .cmd-result {
+            background: #0a1420;
+            padding: 10px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #86efac;
+            white-space: pre;
+        }
+
+        /* Accessibility features list */
+        .access-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .access-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1.25rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gold);
+            border-radius: var(--radius);
+        }
+
+        .access-item-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .access-item h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: var(--navy);
+            margin-bottom: 3px;
+        }
+
+        .access-item p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        /* ── FAQ ── */
+        .faq-list {
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .faq-item {
+            background: var(--white);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            font-family: 'Source Serif 4', serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+            border-bottom: 1px solid transparent;
+            transition: background 0.2s;
+        }
+
+        .faq-question:hover {
+            background: #f8f5f0;
+        }
+
+        .faq-question.open {
+            border-bottom-color: var(--border);
+            background: #f8f5f0;
+        }
+
+        .faq-chevron {
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--text-muted);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.25s;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .faq-question.open .faq-chevron {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s;
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            padding: 0 1.5rem;
+        }
+
+        .faq-answer.open {
+            max-height: 300px;
+            padding: 1rem 1.5rem 1.25rem;
+        }
+
+        /* ── CTA SECTION ── */
+        .cta-section {
+            background: var(--gold-pale);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cta-inner {
+            max-width: 680px;
+            margin: auto;
+            text-align: center;
+            padding: 5rem 2rem;
+        }
+
+        .cta-inner .section-title {
+            font-size: 2.2rem;
+        }
+
+        .cta-inner .section-lead {
+            margin: 1rem auto 2.5rem;
+            max-width: 500px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--navy);
+            color: rgba(255, 255, 255, 0.6);
+            padding: 3rem 2rem 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1140px;
+            margin: auto;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            padding-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand .logo {
+            font-size: 20px;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-brand p {
+            font-size: 13px;
+            line-height: 1.65;
+            max-width: 280px;
+        }
+
+        .footer-col h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .footer-col ul li a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--gold-light);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-bottom p {
+            font-size: 13px;
+        }
+
+        .wcag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .wcag-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #28c840;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-terminal {
+                display: none;
+            }
+
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .demo-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem 4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <!-- Navigation -->
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="#" class="logo" aria-label="VoiceCode home">Voice<span>Code AI</span></a>
+            <ul class="nav-links" role="list">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#demo">Demo</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#get-started" class="btn-primary nav-cta">Get started free</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="skip-nav" tabindex="-1">
+
+        <!-- Hero -->
+        <section class="hero" aria-labelledby="hero-heading">
+            <div class="hero-inner">
+                <div class="hero-text">
+                    <div class="hero-badge" role="status">Live — Beta v2.1</div>
+                    <h1 id="hero-heading">Code without limits.<br /><em>Program by voice.</em></h1>
+                    <p class="hero-lead">
+                        VoiceCode AI is an AI-powered coding assistant designed specifically for blind programmers and developers with hand or motor disabilities. Write, debug, and deploy real code — using only your voice.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#get-started" class="btn-primary" id="get-started">
+                            ▶&nbsp; Start coding free
+                        </a>
+                        <a href="#demo" class="btn-secondary">
+                            See a live demo
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Terminal mockup -->
+                <div class="hero-terminal" role="img" aria-label="Live coding session example">
+                    <div class="terminal-bar">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                        <span class="terminal-title">voicecode — session active</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="t-line">
+                            <span class="t-prompt">you&nbsp;&gt;</span>
+                            <span class="t-voice">Create a Python function that sorts a list</span>
+                        </div>
+                        <div class="t-output">Generating function…</div>
+                        <br />
+                        <div class="t-code">def sort_list(items, reverse=False):</div>
+                        <div class="t-code">&nbsp;&nbsp;&nbsp;&nbsp;"""Sort and return items."""</div>
+                        <div class="t-code">&nbsp;&nbsp;&nbsp;&nbsp;return sorted(items, reverse=reverse)</div>
+                        <br />
+                        <div class="t-comment"># Function created. 3 lines. No errors.</div>
+                        <br />
+                        <div class="t-line">
+                            <span class="t-prompt">you&nbsp;&gt;</span>
+                            <span class="t-voice">Run the tests</span>
+                        </div>
+                        <div class="t-output">Running… ✓ 4/4 passed (0.02s)</div>
+                        <br />
+                        <div class="t-line">
+                            <span class="t-prompt">you&nbsp;&gt;</span>
+                            <span class="t-cursor"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="how-bg" id="how-it-works" aria-labelledby="how-heading">
+            <div class="section-inner">
+                <p class="section-label">Process</p>
+                <h2 class="section-title" id="how-heading">How VoiceCode AI <em>works</em></h2>
+                <p class="section-lead">From spoken sentence to running code — in under a second.</p>
+                <div class="divider" style="background: rgba(196,154,60,0.5);"></div>
+
+                <div class="steps-grid" role="list">
+                    <div class="step" role="listitem">
+                        <div class="step-num">01</div>
+                        <div class="step-icon" aria-hidden="true">🎙</div>
+                        <h3>You speak</h3>
+                        <p>Speak naturally in plain English. Say "write a function" or "fix the bug on line 12" — no special syntax needed.</p>
+                    </div>
+                    <div class="step" role="listitem">
+                        <div class="step-num">02</div>
+                        <div class="step-icon" aria-hidden="true">🧠</div>
+                        <h3>AI understands</h3>
+                        <p>Our acoustic model transcribes with 99.2% accuracy, even in noisy environments. Context-aware parsing understands developer intent.</p>
+                    </div>
+                    <div class="step" role="listitem">
+                        <div class="step-num">03</div>
+                        <div class="step-icon" aria-hidden="true">⚙️</div>
+                        <h3>Code is generated</h3>
+                        <p>A specialised coding LLM produces clean, tested, well-commented code in 30+ languages — instantly inserted into your editor.</p>
+                    </div>
+                    <div class="step" role="listitem">
+                        <div class="step-num">04</div>
+                        <div class="step-icon" aria-hidden="true">🔊</div>
+                        <h3>Audio feedback</h3>
+                        <p>The assistant reads back what it wrote, explains errors, and audibly confirms actions. Full screen-reader integration throughout.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features" aria-labelledby="features-heading">
+            <div class="section-inner">
+                <p class="section-label">Capabilities</p>
+                <h2 class="section-title" id="features-heading">Built for <em>real</em> developers</h2>
+                <p class="section-lead">Every feature is designed with accessibility at its core — not bolted on as an afterthought.</p>
+                <div class="divider"></div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">🗣</div>
+                        <h3>Natural voice commands</h3>
+                        <p>No memorising command syntax. Speak in natural language: "add error handling to this function" or "refactor to use async/await".</p>
+                        <span class="feature-tag">Core feature</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">📢</div>
+                        <h3>Full audio navigation</h3>
+                        <p>Navigate your entire codebase by ear. Jump to function definitions, hear file structure, and get spoken summaries of any block of code.</p>
+                        <span class="feature-tag">Accessibility</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">🐛</div>
+                        <h3>Voice-driven debugging</h3>
+                        <p>Say "where is the bug?" and receive a spoken explanation of the problem, the line number, and a suggested fix — ready to apply on command.</p>
+                        <span class="feature-tag">Core feature</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">🔌</div>
+                        <h3>IDE integration</h3>
+                        <p>Plugins for VS Code, JetBrains, Neovim, and Emacs. Works with your existing workflow — no switching environments required.</p>
+                        <span class="feature-tag">Integration</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">🌐</div>
+                        <h3>30+ languages</h3>
+                        <p>Python, JavaScript, TypeScript, Rust, Go, C++, Java, SQL, HTML/CSS, and more. Switch languages mid-session with a single phrase.</p>
+                        <span class="feature-tag">Languages</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" aria-hidden="true">🔒</div>
+                        <h3>Private by default</h3>
+                        <p>Your code never leaves your machine for training. On-premise and air-gapped deployment available for enterprise teams.</p>
+                        <span class="feature-tag">Privacy</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Section -->
+        <section class="demo-bg" id="demo" aria-labelledby="demo-heading">
+            <div class="section-inner">
+                <p class="section-label">Live example</p>
+                <h2 class="section-title" id="demo-heading">Voice commands in <em>action</em></h2>
+                <p class="section-lead">Real commands, real output. No editing, no tricks.</p>
+                <div class="divider"></div>
+
+                <div class="demo-layout">
+                    <div>
+                        <div class="voice-command-demo" role="region" aria-label="Voice command examples">
+                            <div class="demo-header">
+                                <div class="mic-pulse" aria-hidden="true">🎙</div>
+                                <div class="demo-header-text">
+                                    <strong>VoiceCode AI — Active session</strong>
+                                    <span>Python · test_utils.py · Line 1</span>
+                                </div>
+                            </div>
+<div style="padding:20px;">
+    <button onclick="startVoice()" class="btn-primary">🎤 Speak</button>
+
+    <p id="spokenText" style="margin-top:10px;"></p>
+
+    <pre id="codeOutput" style="background:#0a1420; color:#86efac; padding:15px; margin-top:10px;"></pre>
+</div>
+                            <div class="demo-commands">
+                                <div class="cmd-item">
+                                    <div class="cmd-voice">"Create a function to validate email addresses"</div>
+                                    <div class="cmd-result">import re
+
+                                        def is_valid_email(email: str) -> bool:
+                                        pattern = r'^[\w.+-]+@[\w-]+\.[a-z]{2,}$'
+                                        return bool(re.match(pattern, email))</div>
+                                </div>
+                                <div class="cmd-item">
+                                    <div class="cmd-voice">"Add a docstring to that function"</div>
+                                    <div class="cmd-result">"""
+                                        Validate that email is well-formed.
+                                        Returns True if valid, False otherwise.
+                                        """</div>
+                                </div>
+                                <div class="cmd-item">
+                                    <div class="cmd-voice">"Write unit tests for this"</div>
+                                    <div class="cmd-result">def test_valid_email():
+                                        assert is_valid_email("a@b.com")
+                                        assert not is_valid_email("invalid")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="access-list" role="list" aria-label="Accessibility features">
+                        <div class="access-item" role="listitem">
+                            <div class="access-item-icon" aria-hidden="true">👁</div>
+                            <div>
+                                <h4>Blind-first design</h4>
+                                <p>Every interaction is built assuming no visual feedback. Screen readers receive full, structured descriptions of code context and changes.</p>
+                            </div>
+                        </div>
+                        <div class="access-item" role="listitem">
+                            <div class="access-item-icon" aria-hidden="true">🤲</div>
+                            <div>
+                                <h4>Zero keyboard required</h4>
+                                <p>The entire workflow — writing, editing, running, debugging, committing — is completable without touching a keyboard or mouse.</p>
+                            </div>
+                        </div>
+                        <div class="access-item" role="listitem">
+                            <div class="access-item-icon" aria-hidden="true">⚡</div>
+                            <div>
+                                <h4>Low-fatigue interaction</h4>
+                                <p>Designed to reduce vocal strain with short confirmations, command batching, and an optional eye-gaze input mode.</p>
+                            </div>
+                        </div>
+                        <div class="access-item" role="listitem">
+                            <div class="access-item-icon" aria-hidden="true">🌍</div>
+                            <div>
+                                <h4>Multilingual support</h4>
+                                <p>Give voice commands in English, Spanish, French, German, Japanese, and Mandarin. More languages added each quarter.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials-bg" aria-labelledby="testi-heading">
+            <div class="section-inner">
+                <p class="section-label">From our users</p>
+                <h2 class="section-title" id="testi-heading">Developers <em>speaking</em> for themselves</h2>
+                <div class="divider" style="background: rgba(196,154,60,0.5);"></div>
+
+                <div class="testimonials-grid">
+                    <div class="testi-card">
+                        <p class="testi-quote">I lost most of my hand function in 2021. I thought my career as a developer was over. VoiceCode gave it back to me — I'm shipping features faster than ever.</p>
+                        <div class="testi-author">
+                            <div class="testi-avatar" aria-hidden="true">-By</div>
+                            <div>
+                                <div class="testi-name">Marcus R.</div>
+                                <div class="testi-role">Senior engineer · fintech</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="border:none; border-top:1px solid #ddd; margin:1.5rem 0;">
+                    <div class="testi-card">
+                        <p class="testi-quote">As someone who has been blind since birth, most coding tools were built as an afterthought for people like me. VoiceCode is the first that puts us first.</p>
+                        <div class="testi-author">
+                            <div class="testi-avatar" aria-hidden="true">-By</div>
+                            <div>
+                                <div class="testi-name">Sunita N.</div>
+                                <div class="testi-role">ML researcher · academia</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="border:none; border-top:1px solid #ddd; margin:1.5rem 0;">
+                    <div class="testi-card">
+                        <p class="testi-quote">The audio debugging is extraordinary. It reads the stack trace, explains each frame in plain English, and often suggests the fix before I finish listening.</p>
+                        <div class="testi-author">
+                            <div class="testi-avatar" aria-hidden="true">-By</div>
+                            <div>
+                                <div class="testi-name">David K.</div>
+                                <div class="testi-role">Backend developer · SaaS</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" aria-labelledby="faq-heading">
+            <div class="section-inner">
+                <p class="section-label">Questions</p>
+                <h2 class="section-title" id="faq-heading">Frequently asked <em>questions</em></h2>
+                <div class="divider"></div>
+
+                <div class="faq-list" role="list">
+                    <div class="faq-item" role="listitem">
+                        <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+                            What is VoiceCode AI?
+                            <span class="faq-chevron" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="faq-answer" role="region">
+                            VoiceCode AI is an intelligent voice-based coding assistant designed specifically for developers who cannot or prefer not to use a traditional keyboard and mouse. It uses advanced speech recognition and AI to interpret natural language commands and write code efficiently.
+                        </div>
+                    </div>
+                    <div class="faq-item" role="listitem">
+                        <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+                            Who can benefit from VoiceCode AI?
+                            <span class="faq-chevron" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="faq-answer" role="region">
+                            Our platform is specially tailored for blind and visually impaired programmers, individuals with motor impairments (such as RSI or cerebral palsy), and anyone looking to code hands-free.
+                        </div>
+                    </div>
+                    <div class="faq-item" role="listitem">
+                        <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+                            Do I need to be an expert in voice commands to use this?
+                            <span class="faq-chevron" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="faq-answer" role="region">
+                            No. VoiceCode AI allows you to speak naturally. The AI parses the intent from your voice and translates it into functional code or commands.
+                        </div>
+                    </div>
+                    <div class="faq-item" role="listitem">
+                        <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+                            Is my code secure?
+                            <span class="faq-chevron" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="faq-answer" role="region">
+                            VoiceCode AI prioritizes user privacy. We offer options to process voice commands locally where possible to ensure your proprietary code does not leave your machine, and we adhere to strict data protection standards.
+                        </div>
+                    </div>
+                    <div class="faq-item" role="listitem">
+                        <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+                            Is VoiceCode AI free?
+                            <span class="faq-chevron" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="faq-answer" role="region">
+                            We offer a free tier to get started, with premium features available for advanced AI capabilities and dedicated support.
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section" aria-labelledby="cta-heading">
+            <div class="cta-inner">
+                <p class="section-label" style="text-align:center;">Get started today</p>
+                <h2 class="section-title" id="cta-heading" style="text-align:center;">Your voice is your <em>keyboard.</em></h2>
+                <p class="section-lead" style="text-align:center;">Join over 4,200 developers who code entirely by voice. Free to start — no card required.</p>
+                <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                    <a href="#" class="btn-primary">▶&nbsp; Start for free</a>
+                    <a href="#" class="btn-secondary" style="background:rgba(0,0,0,0.05); color:var(--navy); border-color:var(--border);">Schedule a demo</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="#" class="logo">Voice<span>Code AI</span></a>
+                    <p>AI-powered voice coding for blind programmers and developers with hand or motor disabilities. Because great code should have no barriers.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Developers of VoiceCode AI</h4>
+                    <ul>
+                        <li><a href="#">Veerujothi P (Ist year-IT)</a></li>
+                        <li><a href="#">Prathibha Shivaranjani P (Ist year-IT)</a></li>
+                        <li><a href="#">Shoba M (Ist year-IT)</a></li>
+                        <li><a href="#">Selvalakshmi (Ist year-CSE)</a></li>
+                        <li><a href="#">Vishwa (Ist year-Mech)</a></li>
+                        <li><a href="#">Kamalesh (Ist year-EEE)</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Accessibility guide</a></li>
+                        <li><a href="#">API reference</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Privacy policy</a></li>
+                        <li><a href="#">Terms of service</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 VoiceCode AI, Inc. All rights reserved.</p>
+                <span class="wcag-badge" aria-label="WCAG 2.2 Level AA compliant">WCAG 2.2 AA</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleFaq(btn) {
+            const answer = btn.nextElementSibling;
+            const isOpen = btn.classList.contains('open');
+            document.querySelectorAll('.faq-question').forEach(b => {
+                b.classList.remove('open');
+                b.setAttribute('aria-expanded', 'false');
+                b.nextElementSibling.classList.remove('open');
+            });
+            if (!isOpen) {
+                btn.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+                answer.classList.add('open');
+            }
+        }
+
+        // Keyboard shortcut hint
+        document.addEventListener('keydown', function(e) {
+            if (e.altKey && e.key === 'v') {
+                document.getElementById('skip-nav').focus();
+            }
+        });
+
+        // Smooth fade-in on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('.feature-card, .step, .testi-card, .plan-card, .access-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(16px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(el);
+        });
+// 🎤 Voice Recognition
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = "en-US";
+
+// Button click
+function startVoice() {
+    recognition.start();
+    document.getElementById("spokenText").innerText = "Listening...";
+}
+
+// Voice capture
+recognition.onresult = function(event) {
+    const text = event.results[0][0].transcript;
+    document.getElementById("spokenText").innerText = "You said: " + text;
+    generateCode(text.toLowerCase());
+};
+
+// Code generate
+function generateCode(text) {
+    let output = "";
+
+    if (text.includes("add two numbers")) {
+        output = `# Python
+a = int(input())
+b = int(input())
+print(a + b)`;
+    } 
+    else if (text.includes("factorial")) {
+        output = `# Factorial
+n = int(input())
+fact = 1
+for i in range(1, n+1):
+    fact *= i
+print(fact)`;
+    } 
+    else {
+        output = "// No code found";
+    }
+
+    document.getElementById("codeOutput").innerText = output;
+}
+    </script>
+</body>
+
+</html>
